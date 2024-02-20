@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import util from "util";
 import path from "path";
 import fs from "fs";
+import CustomError from "../utils/customError.util";
 
 const execPromise = util.promisify(exec);
 
@@ -17,15 +18,17 @@ export class ExecuteCodeService {
       // Execute the Docker container
       const { stdout, stderr } = await execPromise(dockerRunCmd);
 
+      if (stderr) throw new Error(stderr);
+
       // Clean up the temporary file
       await fs.promises.unlink(tempFilePath);
 
-      if (stderr) throw new Error(stderr);
       return stdout;
-    } catch (error) {
+    } catch (error: any) {
       // Ensure the temporary file is cleaned up even if execution fails
       await fs.promises.unlink(tempFilePath);
-      throw error;
+      console.log("ERROR", error.message);
+      throw new CustomError(error.message, 400);
     }
   }
 }
