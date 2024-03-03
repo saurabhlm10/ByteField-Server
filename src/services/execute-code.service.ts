@@ -1,34 +1,34 @@
-import { exec } from "child_process";
-import util from "util";
-import path from "path";
-import fs from "fs";
 import CustomError from "../utils/customError.util";
-
-const execPromise = util.promisify(exec);
 
 export class ExecuteCodeService {
   async executeCode(code: string): Promise<string> {
-    const tempFilePath = path.join("/tmp", `code-${Date.now()}.js`);
-    await fs.promises.writeFile(tempFilePath, code);
+    let capturedLogs: any = [];
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+      capturedLogs.push(args.join(" "));
+      originalConsoleLog.apply(console, args);
+    };
 
     try {
-      // Define the Docker run command
-      const dockerRunCmd = `docker run -v "${tempFilePath}:/usr/src/app/code.js" js-execution-environment`;
-
-      // Execute the Docker container
-      const { stdout, stderr } = await execPromise(dockerRunCmd);
-
-      if (stderr) throw new Error(stderr);
-
-      // Clean up the temporary file
-      await fs.promises.unlink(tempFilePath);
-
-      return stdout;
+      const result = eval(code);
+      // Optionally, append the result of the eval to capturedLogs or handle it separately
     } catch (error: any) {
-      // Ensure the temporary file is cleaned up even if execution fails
-      await fs.promises.unlink(tempFilePath);
-      console.log("ERROR", error.message);
-      throw new CustomError(error.message, 400);
+      console.error("Error during code execution:", error);
+      // Restore the original console.log immediately in case of error
+      console.log = originalConsoleLog;
+
+      // Log the error to capturedLogs or handle it as needed
+      capturedLogs.push(`Error during code execution: ${error.message}`);
+
+      // Throwing a CustomError to be handled by the caller
+      throw new CustomError(`Failed to execute code: ${error.message}`, 400);
     }
+
+    // Restore the original console.log after successful execution
+    console.log = originalConsoleLog;
+    console.log("Captured Logs:", capturedLogs.join("\n"));
+
+    // Return the captured logs as the result, or adjust according to your needs
+    return capturedLogs.join("\n") + "\n";
   }
 }
