@@ -1,18 +1,14 @@
-const fs = require("fs");
+// Assuming the environment variable CODE contains the JavaScript code
+const code = process.env.CODE;
 
-// Path to the file containing the user-submitted code
-const codePath = "/usr/src/app/code.js";
+if (!code) {
+  console.error("No code provided");
+  process.exit(1);
+}
 
-// Read and execute the JavaScript code from the file
-fs.readFile(codePath, "utf8", (err, code) => {
-  if (err) {
-    console.error("Error reading code file:", err);
-    return;
-  }
-  try {
-    // Safely evaluate the code
-    eval(code);
-  } catch (error) {
-    console.error("Error executing code:", error);
-  }
-});
+try {
+  // Safely evaluate the code
+  eval(code);
+} catch (error) {
+  console.error("Error executing code:", error);
+}
