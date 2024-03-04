@@ -1,11 +1,7 @@
-import AWS, { KinesisVideoSignalingChannels } from "aws-sdk";
 import CustomError from "../utils/customError.util";
 import axiosInstance from "../config/axiosInstance";
 import { ENV } from "../constants/ENV";
 import { AxiosError } from "axios";
-
-// Configure AWS
-AWS.config.update({ region: "ap-south-1" });
 
 export class ExecuteCodeService {
   async executeCode(code: string): Promise<any> {
