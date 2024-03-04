@@ -1,0 +1,28 @@
+org: saurabhlm10
+app: bytefield
+service: ByteField
+frameworkVersion: "3"
+
+plugins:
+  - serverless-plugin-typescript
+  # - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+
+package:
+  individually: true
+  exclude:
+    - "**/*"
+  include:
+    - "lambda/**"
+
+functions:
+  executeCode:
+    handler: lambda/code-execute.handler
+    events:
+      - httpApi:
+          path: /execute-code
+          method: post
