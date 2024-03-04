@@ -17,11 +17,11 @@ package:
   exclude:
     - "**/*"
   include:
-    - "lambda/**"
+    - "src/lambda/**"
 
 functions:
   executeCode:
-    handler: lambda/code-execute.handler
+    handler: src/lambda/code-execute.handler
     events:
       - httpApi:
           path: /execute-code
