@@ -5,7 +5,17 @@ export const asyncHandler =
   (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { result, status = 200 } = await fn(req, res, next);
+      const { result, status = 200, cookies } = await fn(req, res, next);
+
+      if (cookies) {
+        for (const cookieName in cookies) {
+          res.cookie(cookieName, cookies[cookieName], {
+            secure: true,
+            sameSite: "none",
+          });
+        }
+      }
+
       if (result !== undefined) {
         res.status(status).json(result);
       } else {

@@ -22,5 +22,5 @@ export const login = async (req: Request) => {
   const token = await authService.login({ email, password });
 
   // If login is successful, return the token and HTTP status
-  return { result: { token }, status: 200 };
+  return { result: { token }, status: 200, cookies: { token } };
 };
