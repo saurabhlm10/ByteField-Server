@@ -3,6 +3,7 @@ import executeRoutes from "./execute-code.route";
 import authRouter from "./auth.route";
 import userRouter from "./user.route";
 import snippetRouter from "./snippet.route";
+import projectRouter from "./project.route";
 
 const mainRouter = Router();
 
@@ -10,5 +11,6 @@ mainRouter.use("/execute", executeRoutes);
 mainRouter.use("/auth", authRouter);
 mainRouter.use("/user", userRouter);
 mainRouter.use("/snippet", snippetRouter);
+mainRouter.use("/project", projectRouter);
 
 export default mainRouter;
