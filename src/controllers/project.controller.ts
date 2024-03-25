@@ -14,7 +14,7 @@ export const createProject = async (req: Request, res: Response) => {
 export const getProject = async (req: Request, res: Response) => {
   const { id } = req.params;
   const project = await projectService.getProject({ id: parseInt(id) });
-  res.json(project);
+  return { result: project };
 };
 
 export const getProjects = async (req: Request, res: Response) => {
