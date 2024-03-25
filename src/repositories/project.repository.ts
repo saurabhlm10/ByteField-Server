@@ -51,6 +51,14 @@ export class ProjectRepository {
       const updatedProject = await tx.project.update({
         where: { id: project.id },
         data: { rootFolderId: rootFolder.id },
+        include: {
+          rootFolder: {
+            include: {
+              children: true,
+              project: true,
+            },
+          },
+        },
       });
 
       return updatedProject;
@@ -58,15 +66,50 @@ export class ProjectRepository {
   }
 
   async getProjectById(data: IGetProjectByIdParams) {
+    async function getFileFolderWithChildren(
+      tx: PrismaClient,
+      id: string,
+      isFolder: boolean
+    ) {
+      const fileFolder = await tx.fileFolder.findUnique({
+        where: { id },
+        include: { children: isFolder },
+      });
+
+      if (!fileFolder) {
+        throw new Error(`FileFolder with ID ${id} not found`);
+      }
+
+      if (fileFolder.isFolder) {
+        for (let i = 0; i < fileFolder.children.length; i++) {
+          fileFolder.children[i] = await getFileFolderWithChildren(
+            tx,
+            fileFolder.children[i].id,
+            fileFolder.children[i].isFolder
+          );
+        }
+      }
+
+      return fileFolder;
+    }
+
     return prisma.$transaction(async (tx) => {
       const project = await tx.project.findUnique({
         where: { id: data.id },
-        include: { rootFolder: true }, // Adjusted to include the rootFolder instead
+        include: { rootFolder: true },
       });
 
       if (!project) {
         throw new CustomError(`Project doesn't exist.`, 404);
       }
+
+      const rootFolder = await getFileFolderWithChildren(
+        tx as PrismaClient,
+        project.rootFolderId as string,
+        true
+      );
+
+      project.rootFolder = rootFolder;
 
       return project;
     });
