@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { FileFolderService } from "../services/file-folder.service";
+import CustomError from "../utils/customError.util";
 
 const fileFolderService = new FileFolderService();
 
@@ -31,11 +32,14 @@ export const getAllFileFolders = async (req: Request, res: Response) => {
 export const updateFileFolder = async (req: Request, res: Response) => {
   const { projectId, id } = req.params;
   const data = req.body;
+
   const updatedFileFolder = await fileFolderService.updateFileFolder({
     projectId,
     id,
     fileFolderData: data,
   });
+
+  if (!updatedFileFolder) throw new CustomError("Updation failed", 404);
 
   return { result: updatedFileFolder };
 };

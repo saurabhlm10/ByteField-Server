@@ -144,12 +144,12 @@ export class FileFolderRepository {
             400
           );
         }
-
-        return tx.fileFolder.update({
-          where: { id },
-          data: fileFolderData,
-        });
       }
+
+      return tx.fileFolder.update({
+        where: { id },
+        data: fileFolderData,
+      });
     });
   }
   async deleteFileFolder(data: IDeleteFileFolderParams) {
