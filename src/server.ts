@@ -23,4 +23,14 @@ app.use("/api", mainRouter);
 
 const port = ENV.PORT;
 
+import { exec } from "child_process";
+
+exec("df -h", (error: any, stdout: any, stderr: any) => {
+  if (error) {
+    console.error(`exec error: ${error}`);
+    return;
+  }
+  console.log(`Disk Space Usage:\n${stdout}`);
+});
+
 app.listen(port, () => console.log("server listening on PORT", port));
